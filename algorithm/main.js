@@ -1,11 +1,11 @@
 
-var game = new Phaser.Game(840, 560);
+var game = new Phaser.Game(1000, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
 
-    game.load.tilemap('matching', 'assets/maze.json', null, Phaser.Tilemap.TILED_JSON);
-	game.load.image('tiles', 'assets/maze.png');
-    game.load.spritesheet('chick', 'assets/mageSprite.png', 20, 23);
+    game.load.tilemap('maze', 'assets/maze.json', null, Phaser.Tilemap.TILED_JSON);
+	game.load.image('tiles', 'assets/maze.png');	
+    game.load.spritesheet('mage', 'assets/mageSprite.png', 20, 23);
 }
 
 var speed = 3;
@@ -14,13 +14,17 @@ var player;
 
 function create() {
 
-    map = game.add.tilemap('matching');
-    tileset = game.add.tileset('tiles');
-    layer = game.add.tilemapLayer(0, 0, 840, 560, tileset, map, 0);
+
+    map = game.add.tilemap('maze');
+
+    tiles.addTilesetImage('maze', 28, 28, 0, 2, 1);
+    
+    layer = game.add.tilemapLayer(0, 0, 1000, 600, tileset, map, 0);
+	player = game.add.spritesheet(game.width/2, game.height/2, 'mage');
 	player.anchor.setTo(0.5, 0.5);
 	player.body.immovable = true;
     cursors = game.input.keyboard.createCursorKeys();
-	maze(0,1,1,1);
+	maze(1,2,1,1);
 }
 
 
@@ -48,54 +52,13 @@ function moveBaddie(cat) {
 
 function movePlayer(chick) {
 
-	var p;
-	var q;
-	var tileAbove;
-	var tileLeft;
-	var currentTile;
-
-  //console.log("bodyX = "+chick.body.x);
-  //console.log("X = "+chick.x);
-  //console.log("bodyY = "+chick.body.y);
-  //console.log("Y = "+chick.y);
-
-  
-  //chick.body.x = chick.x;
-  //chick.body.y = chick.y;
-	//chick.x = storedX;
-	//chick.y = storedY;
-
-	p = layer.getTileX(chick.x);
-	q = layer.getTileY(chick.y);
-
-	tileAbove = map.getTile(p,q-1);
-	//tileBelow = map.getTile(p,q+1);
-	tileLeft = map.getTile(p-1,q);
-	//tileRight = map.getTile(p+1,q);
-
-	currentTile = map.getTile(p,q);
-		
-
-   	if (cursors.up.isDown)
-   	{
-	}
-
-    if (cursors.down.isDown)
-    {
-    }
-
-    if (cursors.left.isDown)
-    {
-    }
-    if (cursors.right.isDown)
-    {
-    } 
-
 
 }
 
 function maze(x,y, prevX, prevY) {
 	currentTile = map.getTile(x,y);
+	console.log(currentTile.x);
+	console.log(currentTile.y);
 
 	var north = map.getTile(x,y-1);
 	var south = map.getTile(x,y+1);
@@ -189,7 +152,7 @@ function maze(x,y, prevX, prevY) {
 			}
 			maze(x-1, y, x, y);
 		}
-		
+		//if we can't move in the random direction
 		//going up
 		if(north.index == 8){
 			//from below
