@@ -97,10 +97,10 @@ function movePlayer(chick) {
 function maze(x,y, prevX, prevY) {
 	currentTile = map.getTile(x,y);
 
-	var north = map.getTile(x,y-1).index == 8;
-	var south = map.getTile(x,y+1).index == 8;
-	var east = map.getTile(x+1,y).index == 8;
-	var west = map.getTile(x-1,y).index == 8;
+	var north = map.getTile(x,y-1);
+	var south = map.getTile(x,y+1);
+	var east = map.getTile(x+1,y);
+	var west = map.getTile(x-1,y);
 	
 	var walk = game.rnd.integerInRange(1,4);
 	if(north.index == 8 ||	east.index == 8 || south.index == 8 || west.index == 8){
