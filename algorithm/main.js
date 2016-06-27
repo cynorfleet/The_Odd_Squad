@@ -17,7 +17,7 @@ function create() {
 
     map = game.add.tilemap('maze');
 
-    tiles.addTilesetImage('maze', 28, 28, 0, 2, 1);
+    map.addTilesetImage('maze', 28, 28, 0, 2, 1);
     
     layer = game.add.tilemapLayer(0, 0, 1000, 600, tileset, map, 0);
 	player = game.add.spritesheet(game.width/2, game.height/2, 'mage');
