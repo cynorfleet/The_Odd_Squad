@@ -26,6 +26,7 @@ TopDownGame.Game.prototype = {
     //create player
     var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer')
     this.player = this.game.add.sprite(result[0].x, result[0].y, 'player');
+	this.player.scale.setTo(0.80,0.80);
     this.game.physics.arcade.enable(this.player);
 
     //the camera will follow the player in the world
@@ -35,7 +36,7 @@ TopDownGame.Game.prototype = {
     this.cursors = this.game.input.keyboard.createCursorKeys();
 	this.map.removeTile(1,1, 1);
 	this.carveMaze(1,1);
-	this.rooms = this.game.rnd.integerInRange(10, 30);
+	this.rooms = this.game.rnd.integerInRange(20, 40);
 	for(i = 0; i < this.rooms; i++){
 		this.carveRoom();	
 	}
@@ -95,8 +96,8 @@ TopDownGame.Game.prototype = {
 	roomHeight = this.game.rnd.integerInRange(5, 10);
 	var x = 0;
 	var y = 0;
-	while(x < roomWidth && x + roomLocationX < this.map.width -1){
-		while(y < roomHeight && roomLocationY + y < this.map.height - 1){
+	while(x < roomWidth && x + roomLocationX < this.map.width - 2){
+		while(y < roomHeight && roomLocationY + y < this.map.height - 2){
 			this.map.removeTile(roomLocationX + x, roomLocationY + y, 1);
 			y++;
 		}
@@ -155,25 +156,21 @@ TopDownGame.Game.prototype = {
     this.game.physics.arcade.overlap(this.player, this.doors, this.enterDoor, null, this);
 
     //player movement
-
     this.player.body.velocity.x = 0;
 
-    if(this.cursors.up.isDown) {
-      if(this.player.body.velocity.y == 0)
-      this.player.body.velocity.y -= 50;
+    if (this.cursors.up.isDown) {
+        if (this.player.body.velocity.y == 0)
+            this.player.body.velocity.y -= 200;
+    } else if (this.cursors.down.isDown) {
+        if (this.player.body.velocity.y == 0)
+            this.player.body.velocity.y += 200;
+    } else {
+        this.player.body.velocity.y = 0;
     }
-    else if(this.cursors.down.isDown) {
-      if(this.player.body.velocity.y == 0)
-      this.player.body.velocity.y += 50;
-    }
-    else {
-      this.player.body.velocity.y = 0;
-    }
-    if(this.cursors.left.isDown) {
-      this.player.body.velocity.x -= 50;
-    }
-    else if(this.cursors.right.isDown) {
-      this.player.body.velocity.x += 50;
+    if (this.cursors.left.isDown) {
+        this.player.body.velocity.x -= 200;
+    } else if (this.cursors.right.isDown) {
+        this.player.body.velocity.x += 200;
     }
   },
   collect: function(player, collectable) {
