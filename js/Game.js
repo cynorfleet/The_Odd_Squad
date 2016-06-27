@@ -33,7 +33,76 @@ TopDownGame.Game.prototype = {
 
     //move player with cursor keys
     this.cursors = this.game.input.keyboard.createCursorKeys();
-
+	this.map.removeTile(1,1, 1);
+	this.carveMaze(1,1);
+	this.rooms = this.game.rnd.integerInRange(10, 30);
+	for(i = 0; i < this.rooms; i++){
+		this.carveRoom();	
+	}
+  },
+  
+  carveMaze(x,y){
+	  walk = this.game.rnd.integerInRange(1,4);
+	  //go down
+	  if(walk == 1 && y - 2 > 0 && this.map.getTile(x, y-2, 1) != null){
+		  this.map.removeTile(x, y - 1, 1);
+		  this.map.removeTile(x, y - 2, 1);
+		  this.carveMaze(x, y - 2);
+	  }
+	  //go up
+	  if(walk == 2 && y + 2 < this.map.height && this.map.getTile(x, y+2, 1) != null){
+		  this.map.removeTile(x, y + 1, 1);
+		  this.map.removeTile(x, y + 2, 1);
+		  this.carveMaze(x, y + 2);
+	  }
+	  if(walk == 3 && x - 2 > 0 && this.map.getTile(x - 2,y, 1) != null){
+		  this.map.removeTile(x - 1, y, 1);
+		  this.map.removeTile(x - 2, y, 1);
+		  this.carveMaze(x - 2, y);
+	  }
+	  if(walk == 4 && x + 2 < this.game.width && this.map.getTile(x + 2,y, 1) != null){
+		  this.map.removeTile(x + 1, y, 1);
+		  this.map.removeTile(x + 2, y, 1);
+		  this.carveMaze(x + 2, y);
+	  }
+	  if(x - 2 > 0 && this.map.getTile(x - 2,y, 1) != null){
+		  this.map.removeTile(x - 1, y, 1);
+		  this.map.removeTile(x - 2, y, 1);
+		  this.carveMaze(x - 2, y);
+	  }
+	  if(x + 2 < this.game.width && this.map.getTile(x + 2,y, 1) != null){
+		  this.map.removeTile(x + 1, y, 1);
+		  this.map.removeTile(x + 2, y, 1);
+		  this.carveMaze(x + 2, y);
+	  }
+	  //if we cannot move in a random direction then go where able.
+	  if(y - 2 > 0 && this.map.getTile(x, y-2, 1) != null){
+		  this.map.removeTile(x, y - 1, 1);
+		  this.map.removeTile(x, y - 2, 1);
+		  this.carveMaze(x, y - 2);
+	  }
+	  //go up
+	  if(y + 2 < this.map.height && this.map.getTile(x, y+2, 1) != null){
+		  this.map.removeTile(x, y + 1, 1);
+		  this.map.removeTile(x, y + 2, 1);
+		  this.carveMaze(x, y + 2);
+	  }
+  },
+  carveRoom(){
+	roomLocationX = this.game.rnd.integerInRange(1, this.map.width-1);
+	roomLocationY = this.game.rnd.integerInRange(1, this.map.height-1);
+	roomWidth = this.game.rnd.integerInRange(5, 10);
+	roomHeight = this.game.rnd.integerInRange(5, 10);
+	var x = 0;
+	var y = 0;
+	while(x < roomWidth && x + roomLocationX < this.map.width -1){
+		while(y < roomHeight && roomLocationY + y < this.map.height - 1){
+			this.map.removeTile(roomLocationX + x, roomLocationY + y, 1);
+			y++;
+		}
+		this.map.removeTile(roomLocationX + x, roomLocationY + y, 1);
+		x++;
+	}
   },
   createItems: function() {
     //create items
