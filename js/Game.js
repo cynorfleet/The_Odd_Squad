@@ -21,7 +21,7 @@ TopDownGame.Game.prototype = {
         this.backgroundlayer.resizeWorld();
 
         //make the maze
-        this.maze(this.map.width, this.map.height);
+        this.carveMaze(1, 1);
 
         this.createItems();
         this.createDoors();
@@ -42,49 +42,52 @@ TopDownGame.Game.prototype = {
 
     },
 
-    function maze(x, y) {
-        var n = x * y - 1;
-        if (n < 0) {
-            alert("illegal maze dimensions");
-            return;
+    carveMaze(x, y) {
+        walk = this.game.rnd.integerInRange(1, 4);
+        //go down
+        if (walk == 1 && y - 2 > 0 && this.map.getTile(x, y - 2, 1) != null) {
+            this.map.removeTile(x, y - 1, 1);
+            this.map.removeTile(x, y - 2, 1);
+            this.carveMaze(x, y - 2);
         }
-        var horiz = [];
-        for (var j = 0; j < x + 1; j++) horiz[j] = [],
-            verti = [];
-        for (var j = 0; j < x + 1; j++) verti[j] = [],
-            here = [Math.floor(Math.random() * x), Math.floor(Math.random() * y)],
-            path = [here],
-            unvisited = [];
-        for (var j = 0; j < x + 2; j++) {
-            unvisited[j] = [];
-            for (var k = 0; k < y + 1; k++)
-                unvisited[j].push(j > 0 && j < x + 1 && k > 0 && (j != here[0] + 1 || k != here[1] + 1));
+        //go up
+        if (walk == 2 && y + 2 < this.map.height && this.map.getTile(x, y + 2, 1) != null) {
+            this.map.removeTile(x, y + 1, 1);
+            this.map.removeTile(x, y + 2, 1);
+            this.carveMaze(x, y + 2);
         }
-        while (0 < n) {
-            var potential = [[here[0] + 1, here[1]], [here[0], here[1] + 1],
-		    [here[0] - 1, here[1]], [here[0], here[1] - 1]];
-            var neighbors = [];
-            for (var j = 0; j < 4; j++)
-                if (unvisited[potential[j][0] + 1][potential[j][1] + 1])
-                    neighbors.push(potential[j]);
-            if (neighbors.length) {
-                n = n - 1;
-                next = neighbors[Math.floor(Math.random() * neighbors.length)];
-                unvisited[next[0] + 1][next[1] + 1] = false;
-                if (next[0] == here[0])
-                    horiz[next[0]][(next[1] + here[1] - 1) / 2] = true;
-                else
-                    verti[(next[0] + here[0] - 1) / 2][next[1]] = true;
-                path.push(here = next);
-            } else
-                here = path.pop();
+        if (walk == 3 && x - 2 > 0 && this.map.getTile(x - 2, y, 1) != null) {
+            this.map.removeTile(x - 1, y, 1);
+            this.map.removeTile(x - 2, y, 1);
+            this.carveMaze(x - 2, y);
         }
-        return {
-            x: x,
-            y: y,
-            horiz: horiz,
-            verti: verti
-        };
+        if (walk == 4 && x + 2 < this.game.width && this.map.getTile(x + 2, y, 1) != null) {
+            this.map.removeTile(x + 1, y, 1);
+            this.map.removeTile(x + 2, y, 1);
+            this.carveMaze(x + 2, y);
+        }
+        //if we cannot move in a random direction then go where able.
+        if (y - 2 > 0 && this.map.getTile(x, y - 2, 1) != null) {
+            this.map.removeTile(x, y - 1, 1);
+            this.map.removeTile(x, y - 2, 1);
+            this.carveMaze(x, y - 2);
+        }
+        //go up
+        if (y + 2 < this.map.height && this.map.getTile(x, y + 2, 1) != null) {
+            this.map.removeTile(x, y + 1, 1);
+            this.map.removeTile(x, y + 2, 1);
+            this.carveMaze(x, y + 2);
+        }
+        if (x - 2 > 0 && this.map.getTile(x - 2, y, 1) != null) {
+            this.map.removeTile(x - 1, y, 1);
+            this.map.removeTile(x - 2, y, 1);
+            this.carveMaze(x - 2, y);
+        }
+        if (x + 2 < this.game.width && this.map.getTile(x + 2, y, 1) != null) {
+            this.map.removeTile(x + 1, y, 1);
+            this.map.removeTile(x + 2, y, 1);
+            this.carveMaze(x + 2, y);
+        }
     },
 
 
