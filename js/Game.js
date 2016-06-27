@@ -13,9 +13,12 @@ TopDownGame.Game.prototype = {
     //create layer
     this.backgroundlayer = this.map.createLayer('backgroundLayer');
     this.blockedLayer = this.map.createLayer('blockedLayer');
+	this.Perimeter = this.map.createLayer('Perimeter');
 
     //collision on blockedLayer
     this.map.setCollisionBetween(1, 2000, true, 'blockedLayer');
+	this.map.setCollisionBetween(1, 2000, true, 'Perimeter');
+	
 
     //resizes the game world to match the layer dimensions
     this.backgroundlayer.resizeWorld();
@@ -24,8 +27,8 @@ TopDownGame.Game.prototype = {
     this.createDoors();    
 
     //create player
-    var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer')
-    this.player = this.game.add.sprite(result[0].x, result[0].y, 'player');
+    var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer');
+	this.spawnPlayer();
 	this.player.scale.setTo(0.80,0.80);
     this.game.physics.arcade.enable(this.player);
 
@@ -41,7 +44,19 @@ TopDownGame.Game.prototype = {
 		this.carveRoom();	
 	}
   },
-  
+  spawnPlayer: function(){
+	var x = this.game.rnd.integerInRange(1, this.map.width - 1);
+	while(this.game.math.isEven(x)){
+		x = this.game.rnd.integerInRange(1, this.map.width - 1);
+	}
+	var y = this.game.rnd.integerInRange(1, this.map.height- 1);
+	while(this.game.math.isEven(y)){
+		y = this.game.rnd.integerInRange(1, this.map.height - 1);
+	}
+	var spawn = this.map.getTile(x,y);
+    this.player = this.game.add.sprite(spawn.worldX, spawn.worldY, 'player');
+	//this.game.physics.arcade.overlap(this.player, this.blockedLayer, this.spawnPlayer, null, this);
+  },
   carveMaze(x,y){
 	  walk = this.game.rnd.integerInRange(1,4);
 	  //go down
@@ -152,6 +167,7 @@ TopDownGame.Game.prototype = {
   update: function() {
     //collision
     this.game.physics.arcade.collide(this.player, this.blockedLayer);
+	this.game.physics.arcade.collide(this.player, this.Perimeter);
     this.game.physics.arcade.overlap(this.player, this.items, this.collect, null, this);
     this.game.physics.arcade.overlap(this.player, this.doors, this.enterDoor, null, this);
 
