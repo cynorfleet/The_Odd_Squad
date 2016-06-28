@@ -28,8 +28,10 @@ TopDownGame.Game.prototype = {
     //this.createDoors();    
 
     //create player
-    var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer')
-    this.player = this.game.add.sprite(result[0].x, result[0].y, 'player');
+    var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer');
+	this.spawnPlayer();
+	//this.player.scale.setTo(0.80,0.80);
+    this.player.anchor.setTo(0.5, 0.5);
     this.game.physics.arcade.enable(this.player);
           
     //create the weapon  
@@ -42,18 +44,8 @@ TopDownGame.Game.prototype = {
     //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
     weapon.fireRate = 460;
     //  Tell the Weapon to track the 'player' Sprite, offset by 0px horizontally, 0 vertically
-    weapon.trackSprite(this.player, 5, 5);
-      
-    
-      
-      
-      
-    /*create the blocks group
-    blocks = this.game.add.group();
-    blocks.enableBody = true;*/
-      
-       
-      
+    weapon.trackSprite(this.player, 0, 0);
+   
       
 
     //the camera will follow the player in the world
@@ -120,6 +112,22 @@ TopDownGame.Game.prototype = {
 		  this.carveMaze(x, y + 2);
 	  }
   },
+    
+    //Places the player on an odd numbered sprite (empty)  
+  spawnPlayer: function(){
+	var x = this.game.rnd.integerInRange(1, this.map.width - 1);
+	while(this.game.math.isEven(x)){
+		x = this.game.rnd.integerInRange(1, this.map.width - 1);
+	}
+	var y = this.game.rnd.integerInRange(1, this.map.height- 1);
+	while(this.game.math.isEven(y)){
+		y = this.game.rnd.integerInRange(1, this.map.height - 1);
+	}
+	var spawn = this.map.getTile(x,y);
+    this.player = this.game.add.sprite(spawn.worldX + 8, spawn.worldY + 8, 'player');
+	//this.game.physics.arcade.overlap(this.player, this.blockedLayer, this.spawnPlayer, null, this);
+  },
+    
   carveRoom(){
 	roomLocationX = this.game.rnd.integerInRange(1, this.map.width-1);
 	roomLocationY = this.game.rnd.integerInRange(1, this.map.height-1);
