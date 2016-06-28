@@ -30,7 +30,24 @@ TopDownGame.Game.prototype = {
     var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer');
 	this.spawnPlayer();
 	this.player.scale.setTo(0.80,0.80);
+    this.player.anchor.setTo(0.5, 0.5);
     this.game.physics.arcade.enable(this.player);
+	
+	//  Creates 10 bullets, using the 'bullet' graphic
+    weapon = this.game.add.weapon(10, 'bullets');
+      
+    //  The bullet will be automatically killed when it leaves the world bounds
+    weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+
+    //  The speed at which the bullet is fired
+    weapon.bulletSpeed = 400;
+      
+    //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+    weapon.fireRate = 460;
+      
+    //  Tell the Weapon to track the 'player' Sprite, offset
+    weapon.trackSprite(this.player, 0, 0);
+    
 
     //the camera will follow the player in the world
     this.game.camera.follow(this.player);
@@ -44,6 +61,7 @@ TopDownGame.Game.prototype = {
 		this.carveRoom();	
 	}
   },
+  //Places the player on an odd numbered sprite (empty)  
   spawnPlayer: function(){
 	var x = this.game.rnd.integerInRange(1, this.map.width - 1);
 	while(this.game.math.isEven(x)){
@@ -54,7 +72,7 @@ TopDownGame.Game.prototype = {
 		y = this.game.rnd.integerInRange(1, this.map.height - 1);
 	}
 	var spawn = this.map.getTile(x,y);
-    this.player = this.game.add.sprite(spawn.worldX, spawn.worldY, 'player');
+    this.player = this.game.add.sprite(spawn.worldX + 8, spawn.worldY + 8, 'player');
 	//this.game.physics.arcade.overlap(this.player, this.blockedLayer, this.spawnPlayer, null, this);
   },
   carveMaze(x,y){
@@ -141,7 +159,7 @@ TopDownGame.Game.prototype = {
     }, this);
   },
 
-  //find objects in a Tiled layer that containt a property called "type" equal to a certain value
+  //find objects in a Tiled layer that contain a property called "type" equal to a certain value
   findObjectsByType: function(type, map, layer) {
     var result = new Array();
     map.objects[layer].forEach(function(element){
@@ -166,7 +184,7 @@ TopDownGame.Game.prototype = {
   },
   update: function() {
     //collision
-    this.game.physics.arcade.collide(this.player, this.blockedLayer);
+    this.game.physics.arcade.collide(this.player, this.blockedLayer, this.destroyTile);
 	this.game.physics.arcade.collide(this.player, this.Perimeter);
     this.game.physics.arcade.overlap(this.player, this.items, this.collect, null, this);
     this.game.physics.arcade.overlap(this.player, this.doors, this.enterDoor, null, this);
@@ -177,17 +195,26 @@ TopDownGame.Game.prototype = {
     if (this.cursors.up.isDown) {
         if (this.player.body.velocity.y == 0)
             this.player.body.velocity.y -= 200;
+            this.player.angle = 270;
     } else if (this.cursors.down.isDown) {
         if (this.player.body.velocity.y == 0)
             this.player.body.velocity.y += 200;
+            this.player.angle = 90;
     } else {
         this.player.body.velocity.y = 0;
     }
     if (this.cursors.left.isDown) {
         this.player.body.velocity.x -= 200;
+        this.player.angle = 180;
     } else if (this.cursors.right.isDown) {
         this.player.body.velocity.x += 200;
+        this.player.angle = 0;
     }
+	if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
+    {
+        weapon.fireAngle = this.player.angle;
+        weapon.fire();
+	}
   },
   collect: function(player, collectable) {
     console.log('yummy!');
@@ -198,4 +225,7 @@ TopDownGame.Game.prototype = {
   enterDoor: function(player, door) {
     console.log('entering door that will take you to '+door.targetTilemap+' on x:'+door.targetX+' and y:'+door.targetY);
   },
+    destoryTile: function(player, tile){
+        tile.kill();
+    }
 };
