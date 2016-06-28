@@ -15,7 +15,7 @@ TopDownGame.Game.prototype = {
     this.perimeterlayer = this.map.createLayer('perimeterLayer')
     this.blockedLayer = this.map.createLayer('blockedLayer');
 
-    //collision on blockedLayer
+    //collision on blockedLayer and perimeterLayer
     this.map.setCollisionBetween(1, 2000, true, 'blockedLayer');
     this.map.setCollisionBetween(1, 2000, true, 'perimeterLayer');
       
@@ -30,25 +30,28 @@ TopDownGame.Game.prototype = {
     var result = this.findObjectsByType('playerStart', this.map, 'objectsLayer')
     this.player = this.game.add.sprite(result[0].x, result[0].y, 'player');
     this.game.physics.arcade.enable(this.player);
-      
-    
-      
+          
+    //create the weapon  
     //  Creates 10 bullets, using the 'bullet' graphic
     weapon = this.game.add.weapon(10, 'bullets');
-      
     //  The bullet will be automatically killed when it leaves the world bounds
     weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-
     //  The speed at which the bullet is fired
     weapon.bulletSpeed = 400;
-      
     //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
     weapon.fireRate = 460;
+    //  Tell the Weapon to track the 'player' Sprite, offset by 0px horizontally, 0 vertically
+    weapon.trackSprite(this.player, 5, 5);
       
-    //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
-    weapon.trackSprite(this.player, 14, 0);
     
-   
+      
+      
+      
+    /*create the blocks group
+    blocks = this.game.add.group();
+    blocks.enableBody = true;*/
+      
+       
       
       
 
@@ -176,12 +179,26 @@ TopDownGame.Game.prototype = {
         sprite[key] = element.properties[key];
       });
   },
+    
+    /*create blocks from blockedLayer
+    this.map.createFromTiledObject('blockedLayer', )*/
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
   update: function() {
-    //collision
+    //collision and overlap
     this.game.physics.arcade.collide(this.player, this.blockedLayer);
     this.game.physics.arcade.collide(this.player, this.perimeterlayer);
     this.game.physics.arcade.overlap(this.player, this.items, this.collect, null, this);
     this.game.physics.arcade.overlap(this.player, this.doors, this.enterDoor, null, this);
+    this.game.physics.arcade.collide(weapon.bullets, this.blockedLayer, this.strike, null, this);
 
     //player movement
 
@@ -207,30 +224,24 @@ TopDownGame.Game.prototype = {
     }
       if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
     {
-       if (this.cursors.up.isDown){
+       if (this.cursors.up.isDown)
            weapon.fireAngle = 270;
-           weapon.fire();
-       }
-        
-        if (this.cursors.down.isDown){
+       if (this.cursors.down.isDown)
            weapon.fireAngle = 90;
-           weapon.fire();
-       }
-       
-        if (this.cursors.right.isDown){
+       if (this.cursors.right.isDown)
            weapon.fireAngle = 0;
-           weapon.fire();
-       }
-       
-        if (this.cursors.left.isDown){
+       if (this.cursors.left.isDown)
            weapon.fireAngle = 180;
-           weapon.fire();
-       }
-       
+    
+       weapon.fire(); 
     }
   },
     
-   
+   strike: function(bullet, blockedLayer) {
+    //console.log('hit!');
+    bullet.kill();
+    this.tile.remove();
+   },
     
   
     collect: function(player, collectable) {
