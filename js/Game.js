@@ -18,6 +18,7 @@ TopDownGame.Game.prototype = {
     //collision on blockedLayer and perimeterLayer
     this.map.setCollisionBetween(1, 2000, true, 'blockedLayer');
     this.map.setCollisionBetween(1, 2000, true, 'perimeterLayer');
+    
       
     //resizes the game world to match the layer dimensions
     this.backgroundlayer.resizeWorld();
@@ -237,11 +238,16 @@ TopDownGame.Game.prototype = {
     }
   },
     
-   strike: function(bullet, blockedLayer) {
-    //console.log('hit!');
-    bullet.kill();
-    this.tile.remove();
-   },
+   strike: function (bullet, block) {
+       console.log('hit!');
+       bullet.kill();
+       
+       block.alpha -= .25;
+       if (block.alpha == 0){
+           this.map.removeTile(block.x, block.y, this.blockedLayer);
+       }
+           
+   }, 
     
   
     collect: function(player, collectable) {
